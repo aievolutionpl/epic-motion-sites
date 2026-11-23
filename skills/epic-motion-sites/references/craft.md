@@ -75,6 +75,13 @@ A recoloured template effect does not count.
 
 **Fixed chrome**
 - A transparent nav over the hero must turn solid (background + ink colour) once the story section has scrolled away. Otherwise it collides with content. Both test builds hit this.
+- Over a changing field, pick the chrome's ink per frame by contrast (cream or ink), never a linear mix of the two.
+
+**Motion quality** (see `motion-toolkit.md` for numbers and code)
+- The first screen has an entrance (1.2–1.8 s): nothing premium appears all at once.
+- One easing family; exits faster than entrances; staggers 40–80 ms.
+- Nothing is ever fully still: idle life on the hero object, but calm once the story is moving.
+- Two versions of one object (photo ↔ layers) are never visible at once: check the crossfade frames.
 
 ## 3. Refuse list (things that make it look AI-generated)
 

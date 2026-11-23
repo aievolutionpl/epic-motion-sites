@@ -1,6 +1,7 @@
 # Motion site patterns
 
-These seven patterns were distilled from studio.motionsites.ai/explore (Nov 2026). Each entry covers:
+Patterns A–G were distilled from studio.motionsites.ai/explore (Nov 2026); H is the classic
+Apple-style frame scrub. Each entry covers:
 - what it looks like,
 - which assets it needs,
 - the choreography,
@@ -29,7 +30,7 @@ Reference: Noodle Twirl. Our tested build: `assets/template-scroll-explode.html`
 - `toCream=ss(.14,.3)`
 - `toCenter=ss(.1,.32)`
 - `ex=ss(.22,.46)-ss(.64,.8)`
-- photo → layers crossfade `ss(.19,.26)`, and back `ss(.7,.8)`
+- photo → layers crossfade `ss(.19,.26)`, and back `ss(.795,.83)`: only once `ex` is ~0, or two burgers show at once
 - labels `ss(.3,.42)-ss(.56,.64)`
 - land `ss(.7,.92)`
 - plate `ss(.62,.82)`
@@ -38,6 +39,7 @@ Reference: Noodle Twirl. Our tested build: `assets/template-scroll-explode.html`
 **Notes:**
 - Layer offset is `(i-(N-1)/2)*GAP*ex` plus a small alternating rotate and translateX.
 - Counter-scale labels with `scale(1/s)` so the text stays readable.
+- Intro (time-based, before any scroll): headline words rise in with a stagger, the product drops in with `outBack`.
 
 Fits: burgers, ramen, sandwiches, cakes, sneakers (sole/midsole/upper/laces), headphones, skincare routines, cocktails.
 
@@ -55,7 +57,10 @@ Reference: Smoothie Slider ("Blendy"). Our tested build: `assets/template-giant-
 - The whole slide group slides horizontally.
 - The word, product and ingredients move at **different speeds** (parallax: word 1.4×, product 1×, near ingredients 1.8×).
 - The background colour cross-fades.
-- Drive it with wheel/arrows/tabs into a target index, then `cur+=(target-cur)*.08`.
+- Drive it with wheel/arrows/tabs/swipe into a target index, then smooth `cur` toward it.
+- Intro: the word rises, the bottle lifts in, the ingredients burst out from behind it.
+- Autoplay (optional): never with reduced motion, stops for good on the first interaction, pauses off screen.
+- The giant word is decorative (`aria-hidden`); the tabs and a visually hidden `<h1>` carry the meaning.
 
 **Assets:**
 - 1 product per flavour (consistent packshot, transparent);
@@ -162,8 +167,53 @@ Reference: Outfit Carousel.
 
 ---
 
+## H. Frame Sequence — "the Apple scrub"
+Reference: AirPods / iPhone product pages. Needs a video, not just stills.
+
+**Look:**
+- A full-bleed `<canvas>` shows one frame of a pre-rendered clip; scrolling scrubs through it.
+  The product turns 360°, opens up, assembles from parts, or the camera flies into a scene.
+- 3–4 short captions fade in and out at fixed points of the scrub, each over a soft scrim.
+- Ends on a still hero frame with the CTA, then normal sections.
+
+**Assets:**
+- One 4–6 s clip with a **locked, steady camera move** and a background that matches the page
+  field colour (or a full scene). Image-to-video from your hero still works well; first/last-frame
+  models can animate "exploded → assembled" between two stills.
+- `python scripts/video_to_frames.py clip.mp4 site/frames --frames 120 --width 1600 --mobile-width 900`
+  → `f0001.webp…`, plus `m/` for phones, and prints the `FRAMES` line.
+
+**Choreography** (`p` over a 400–500vh section): `frame=round(ss(0,.9,p)*(count-1))`, captions
+`ss(a,a+.08)-ss(b,b+.08)`; hold the last 10% on the final frame for the CTA.
+
+**Implementation** (tested; drop it into the engine's `frame()`):
+```js
+const FRAMES={count:120, path:i=>`frames/${innerWidth<860?"m/":""}f${String(i+1).padStart(4,'0')}.webp`};
+const cv=$('seq'), cx=cv.getContext('2d'), imgs=new Array(FRAMES.count); let drawn=-1;
+const load=i=>imgs[i]||(imgs[i]=Object.assign(new Image(),{decoding:'async',src:FRAMES.path(i)}));
+// progressive: every 8th frame first (a coarse scrub works at once), then fill the gaps
+const order=[...Array(FRAMES.count).keys()].sort((a,b)=>(a%8>0)-(b%8>0));
+let qi=0; (function pump(){ for(let k=0;k<6&&qi<order.length;k++) load(order[qi++]); if(qi<order.length) setTimeout(pump,50); })();
+function nearest(i){ for(let d=0;d<FRAMES.count;d++) for(const j of [i-d,i+d]){ const im=imgs[j]; if(im&&im.complete&&im.naturalWidth) return j; } return -1; }
+function size(){ const r=Math.min(2,devicePixelRatio||1); cv.width=innerWidth*r; cv.height=innerHeight*r; drawn=-1; }
+function draw(i){ const j=nearest(i); if(j<0||j===drawn) return; drawn=j; const im=imgs[j];
+  const s=Math.max(cv.width/im.naturalWidth,cv.height/im.naturalHeight), w=im.naturalWidth*s, h=im.naturalHeight*s;
+  cx.drawImage(im,(cv.width-w)/2,(cv.height-h)/2,w,h); }               // object-fit: cover
+addEventListener('resize',size); size();
+// in frame(p): draw(Math.round(ss(0,.9,p)*(FRAMES.count-1)));
+```
+- `<canvas id="seq" aria-hidden="true">` absolutely fills the sticky stage; put the story in real text.
+- Captions over video need a scrim (`linear-gradient` band behind them): verify.py flags them otherwise.
+- Weight: 120 frames is typically 4–8 MB on desktop. That is the one pattern allowed over the 3 MB
+  budget; keep phones on the `m/` set (~1.5 MB) and say the number in the hand-off.
+- Reduced motion: show a single representative frame and the captions as a static list.
+
+Fits: gadgets, cars, watches, sneakers, bottles, furniture, architecture fly-throughs.
+
+---
+
 ## Shared chrome (all patterns)
-- **Nav:** logo left; 3–5 uppercase links centre with a small underline on the active one; a pill CTA and a hamburger on the right. The nav colour follows the scene.
+- **Nav:** logo left; 3–5 uppercase links centre with a small underline on the active one; a pill CTA and a hamburger `<button aria-label>` on the right. The nav ink is picked per frame as whichever of ink/cream has more contrast with the current field (never a linear mix of the two: halfway it is unreadable).
 - **Scene indicator:** a vertical "01 / SECTION 01" rail on the left and dots on the right.
 - **Type:** display at `clamp(54px,7.6vw,118px)` with line-height ~.86; kicker 13–15px, letter-spacing .2em, weight 600.
 - **CTA pill:** cream on colour, or ink on cream; arrow →; hover lift.

@@ -15,9 +15,18 @@ The look depends on **consistent, isolated, transparent cutouts**. Plan them as 
    - `meta/muse-image/text-to-image` ($0.01) on a pure white background, then `fal-ai/birefnet/v2` for the cutout.
    - If it says "out of credits", tell the user once with the top-up link, offer Higgsfield and wait for their choice.
 3. **Any other generator** that can produce transparent PNGs, or a white background followed by a background remover.
-4. If none is available, build with SVG/CSS shapes so the motion can be reviewed, and swap in photos later.
+4. If none is available, run `python scripts/placeholders.py <site>/img --preset explode` (or `--preset slider`,
+   or `name:WxH:shape:#colour` specs). It writes shaded, labelled stand-in cutouts under the template's
+   file names, so the whole choreography can be reviewed now and real photos dropped in later.
 
 Respect the user's cost preferences. Default to cheap, good models, and use premium ones only when the user asks.
+
+## Keep the set consistent
+- Generate the **assembled hero first**, approve it, then generate the parts in the same words.
+- If the tool accepts a reference image (Higgsfield, fal edit models), pass the approved hero as the
+  reference for every part: "the [part] from this burger, isolated…". Same light, same style.
+- Keep a fixed seed per set when the tool exposes one, and change only the subject words.
+- One camera description for the whole set, copied verbatim into every prompt.
 
 ## Prompt recipe (cutout layer)
 ```
@@ -46,6 +55,15 @@ Transparent background, no plate, no shadow, no text.
 - Describe the light ("rim-lit by fire, reflections on wet stone").
 - Generate a separate foreground cutout (ridge, fog, leaves) on transparent, to mask the giant word.
 
+## Video (pattern H, hero loops)
+- **Frame sequences** (pattern H): image-to-video from the approved hero still. Ask for a locked-off,
+  slow, continuous move: "slow 360° turntable rotation, camera locked, seamless studio background #hex,
+  no cuts, no zoom". Models with first + last frame input can animate between two stills
+  (e.g. exploded → assembled). 4–6 s is plenty. Then `scripts/video_to_frames.py`.
+- **Hero loops** (patterns D/E): "subtle ambient motion only: drifting fog, flickering firelight,
+  camera static". Ask for a loop or pick a clip whose first and last frames match.
+- Video costs much more than stills. Estimate, say the number, and get an OK before generating.
+
 ## Review before use
 - Make a contact sheet: paste each cutout onto the brand colour (`scripts/prep_assets.py --sheet`) and look at it.
 - Regenerate anything with:
@@ -58,10 +76,14 @@ Transparent background, no plate, no shadow, no text.
   It costs about 1 credit, much cheaper than a weak page.
 
 ## Prepare for the web
-Run `python scripts/prep_assets.py <src_dir> <out_dir> [--width 840] [--sheet sheet.png --bg "#b8461a"]`. It:
+Run `python scripts/prep_assets.py <src_dir> <out_dir> [--width 840] [--sheet sheet.png --bg "#b8461a"] [--json sizes.json]`. It:
 - crops each image to its alpha bounding box (threshold 12), so layout math uses the visible object;
 - resizes it to the given width (2× the CSS width, for retina);
 - saves it as WebP (q84, with alpha); a typical layer is 50–150 KB;
-- prints `name  WxH  css_height@420`, which you use as the layer `h`.
+- prints `name  WxH  css_height@420`, which you use as the layer `h`;
+- **flags** what will look wrong: `OPAQUE` (no transparency), `CUT OFF` (object touches the frame),
+  `HALO` (fringe from background removal), `HEAVY` (too many KB). Regenerate flagged images;
+- with `--key-bg`, removes a flat light studio background from opaque images (a fallback, not a
+  replacement for a real background remover).
 
 Keep the PNG originals in `img/src/`. Tell the user what the assets cost (credits used / remaining).

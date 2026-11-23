@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>A skill for AI agents that builds animated "wow" websites:<br>
-  scroll-driven products exploding into layers, flavour sliders with a giant word, 3D galleries.</b><br>
+  scroll-driven products exploding into layers, flavour sliders with a giant word, Apple-style frame scrubs, 3D galleries.</b><br>
   One HTML file. Photoreal AI product photos. Automatic verification in a real browser.
 </p>
 
@@ -34,10 +34,10 @@
 
 You give the agent one sentence, e.g. *"make a site for my burger bar in the style of motionsites"*. The agent then:
 
-1. **picks a pattern** from 7 tested ones and writes a short story for the page (feeling, peak, signature move);
-2. **generates photoreal AI product photos**, each element as a separate cutout on a transparent background;
-3. **builds the site** as one `index.html` file: HTML + CSS + vanilla JS, no frameworks, no build step;
-4. **walks it in a headless browser** on desktop and phone, takes screenshots of every scene and catches bugs on its own;
+1. **picks a pattern** from 8 tested ones and writes a short story for the page (feeling, peak, signature move);
+2. **generates photoreal AI product photos**, each element as a separate cutout on a transparent background, and flags bad cutouts automatically (no transparency, cut off, halo, too heavy). With no image tool it builds labelled placeholders, so you can review the motion first;
+3. **builds the site** as one `index.html` file: HTML + CSS + vanilla JS, no frameworks, no build step. It includes an intro on load, inertia that feels the same at 60 and 120 Hz, reduced-motion support, keyboard access and social meta tags;
+4. **walks it in a headless browser** on desktop and phone, takes screenshots of every scene and catches bugs on its own: overlapping text, low contrast on the actual frame, page weight and missing accessibility basics;
 5. fixes what it finds, then **hands off** the result with a list of costs and placeholders.
 
 ## 🎬 Examples (built entirely by an agent with this skill)
@@ -70,7 +70,7 @@ Each flavour has its own colour, a **giant word behind the bottle** and fruit fl
 
 > 💸 AI photos for both sites cost about **20 credits** in total (≈1 per image, 20 images including retakes).
 
-## 🧩 7 patterns
+## 🧩 8 patterns
 
 | | Pattern | What happens | Best for |
 |---|---|---|---|
@@ -81,8 +81,9 @@ Each flavour has its own colour, a **giant word behind the bottle** and fruit fl
 | **E** | **Living Hero** | the scene reacts to the cursor: glow and fireflies | agencies, portfolios, wellness |
 | **F** | **3D Gallery Walk** | a CSS 3D corridor you walk through with scroll or drag | prints, collections, portfolios |
 | **G** | **Shop-the-Look** | a carousel of models with hotspots and a side cart | fashion, bundles |
+| **H** | **Frame Sequence** | Apple-style: scroll scrubs a pre-rendered clip on a canvas (turntable, product opening) | gadgets, cars, watches, sneakers |
 
-A and B come with **complete, tested templates**. C–G have a detailed recipe and a shared animation engine.
+A and B come with **complete, tested templates**. C–H have a detailed recipe and a shared animation engine (H's canvas code is tested). On top of that, a **motion toolkit** adds easings, entrance choreography, text reveals without SplitText, a pinned horizontal rail, magnetic buttons, View Transitions and native CSS scroll-driven reveals.
 
 ## 🔁 How it works
 
@@ -100,8 +101,8 @@ flowchart LR
 **The animation engine** is about 40 lines of vanilla JS. One smoothed value drives everything:
 
 ```js
-cur += (target - cur) * .09;              // inertia
-const ex = ss(.22,.46,p) - ss(.64,.80,p); // the "explode" phase: in, then out
+cur += (target - cur) * (1 - Math.pow(1 - .09, dt / 16.67)); // inertia, same feel at 60 and 120 Hz
+const ex = ss(.22,.46,p) - ss(.64,.80,p);                   // the "explode" phase: in, then out
 layer.style.transform = `translateY(${(i-(N-1)/2) * GAP * ex}px)`;
 ```
 
@@ -109,22 +110,27 @@ There is no GSAP dependency. For complex sites the skill switches to **GSAP + Sc
 
 ## 🔍 Automatic verification
 
-The agent does not take its own word for it. `verify.py` (Playwright) scrolls the page to every key point on **1440×860 and 390×844**. It takes screenshots, builds a contact sheet and reports:
+The agent does not take its own word for it. `verify.py` (Playwright) scrolls the page to every key point on **1440×860 and 390×844**, optionally with reduced motion. It takes screenshots, builds a contact sheet and reports:
 
-- console errors and **missing images**;
-- horizontal overflow;
-- **visible text running off the screen**;
-- (for sliders) the state after each step, e.g. `go(1)`.
+- console errors, failed requests and **missing images**;
+- horizontal overflow and **visible text running off the screen**;
+- **text overlapping other text**, measured on the glyphs, not the boxes;
+- **low contrast on the rendered frame**, sampled from the screenshot (so it also works over colour fades, photos and video);
+- product images under a transparent fixed nav;
+- **page weight** and heavy images, long tasks and CLS;
+- missing basics: `lang`, viewport, title, `alt`, unnamed buttons, no `prefers-reduced-motion`, no meta description or og:image;
+- (for sliders) the state after each step, e.g. `go(1)`. Add `--json` for a machine-readable report.
 
 ```text
-$ python verify.py http://localhost:5517/ --mobile
+$ python verify.py http://localhost:5500/ --mobile
 == desktop 1440x860: 10 states -> shots/desktop-sheet.png
-  OK - no automatic findings. Now read the sheet for overlaps and taste.
-== mobile 390x844: 10 states -> shots/mobile-sheet.png
-  WARN  [p=0.12] text outside viewport: <h1> "MIŁOŚĆ OD PIERWSZEGO KĘSA."
+  WARN  [p=0.25] low contrast ~2.2:1 (needs 4.5): "ZAREZERWUJ ⌕"
+  WARN  [p=0] low contrast ~4.4:1 (needs 4.5): "Rozbity na rozgrzanej płycie. Wykończony"
+  WARN  no prefers-reduced-motion handling found (snap the smoothed value, stop idle motion/autoplay)
+  info  page weight 1.11 MB; heaviest: burger.webp 362KB, patty.webp 152KB, topbun.webp 134KB
 ```
 
-That warning is real: it caught bugs in both examples while they were being built, and the fixes are already in this repo.
+Those warnings are real: v1.1 of the checker found them in the v1.0 examples (the nav colour was being mixed through an unreadable mid-tone, and body copy at 95% opacity dipped under 4.5:1). The fixes are in this repo, and both examples now pass clean, with and without reduced motion.
 
 ## 🚀 Installation
 
@@ -149,8 +155,8 @@ Read skills/epic-motion-sites/SKILL.md and use it to build my website.
 ```
 
 ### Requirements
-- Python 3.10+ with `pillow` and `playwright` (`pip install pillow playwright && playwright install chromium`)
-- `ffmpeg`, only for `study_reference.py`
+- Python 3.10+ with `pillow` and `playwright` (`pip install pillow playwright && playwright install chromium`; or set `CHROMIUM_PATH` to an existing Chromium)
+- `ffmpeg`, only for `study_reference.py` and `video_to_frames.py`
 - An image generator for the photos, e.g. **Higgsfield**, **fal.ai** or any model that returns PNGs with a transparent background. Without one, the skill builds placeholders and tells you.
 
 ## 💬 Example prompts
@@ -167,6 +173,9 @@ https://studio.motionsites.ai/explore/forge-gate - make something like this, but
 ```text
 Art print shop: a 3D gallery you walk through, click a print → product card.
 ```
+```text
+Landing page for wireless earbuds: the case opens and turns as you scroll, like Apple's product pages.
+```
 
 ## 📁 Structure
 
@@ -175,18 +184,23 @@ epic-motion-sites/
 ├── skills/epic-motion-sites/
 │   ├── SKILL.md                      ← workflow for the agent
 │   ├── references/
-│   │   ├── patterns.md               ← 7 patterns with choreography
+│   │   ├── patterns.md               ← 8 patterns with choreography
 │   │   ├── scroll-engine.md          ← vanilla animation engine + tests
+│   │   ├── motion-toolkit.md         ← easings, intros, text reveals, rail, cursor, view transitions
 │   │   ├── craft.md                  ← story, taste floor, refuse list
-│   │   ├── ai-assets.md              ← AI photo prompts, costs, preparation
+│   │   ├── ai-assets.md              ← AI photo + video prompts, costs, preparation
+│   │   ├── ship.md                   ← performance budget, accessibility, SEO, deploy, hand-off
 │   │   └── gsap.md                   ← when and how to switch to GSAP
 │   ├── scripts/
 │   │   ├── verify.py                 ← automatic check (Playwright)
-│   │   ├── prep_assets.py            ← crop → WebP → contact sheet
-│   │   └── study_reference.py        ← analyse a reference site's video
+│   │   ├── prep_assets.py            ← crop → WebP → flags → contact sheet
+│   │   ├── placeholders.py           ← stand-in cutouts when there are no photos yet
+│   │   ├── video_to_frames.py        ← clip → WebP frame sequence (pattern H)
+│   │   └── study_reference.py        ← analyse a reference site's video (+ key beats)
 │   └── assets/
 │       ├── template-scroll-explode.html
-│       └── template-giant-word-slider.html
+│       ├── template-giant-word-slider.html
+│       └── BRIEF.template.md
 ├── examples/                         ← live demos (GitHub Pages)
 ├── media/                            ← GIFs and screenshots for this README
 └── .claude-plugin/                   ← Claude Code plugin manifest
@@ -196,7 +210,7 @@ epic-motion-sites/
 
 This repo combines the best of what we found, and credits it openly:
 
-- **[studio.motionsites.ai](https://studio.motionsites.ai/explore)**: the gallery the 7 patterns were distilled from. We take patterns, never their images, logos or copy.
+- **[studio.motionsites.ai](https://studio.motionsites.ai/explore)**: the gallery patterns A–G were distilled from. We take patterns, never their images, logos or copy.
 - **[greensock/gsap-skills](https://github.com/greensock/gsap-skills)** (MIT): the official GSAP skills. Our `gsap.md` defers to them for API details.
 - **[nateherkai/scroll-craft](https://github.com/nateherkai/scroll-craft)** (MIT): the inspiration for the feeling curve, the single peak, the signature move, the refuse list and automated page walking. Rewritten in our own words for a lighter workflow.
 - **[anthropics/skills](https://github.com/anthropics/skills)**: the Agent Skills format.
@@ -210,9 +224,10 @@ Full list: [CREDITS.md](CREDITS.md).
 **Epic Motion Sites** to skill dla agentów AI (Claude Code, Codex, Cursor i każdy agent czytający `SKILL.md`), który buduje animowane strony w stylu galerii nagród — w jednym pliku HTML:
 - produkt rozpadający się na warstwy podczas scrolla;
 - slider smaków z gigantycznym słowem i składnikami w paralaksie;
+- przewijanie klatek wideo jak na stronach Apple;
 - sceny filmowe, hero reagujące na kursor, galerie 3D i shop-the-look.
 
-Agent planuje historię strony (krzywa emocji, jeden szczyt, jeden ruch-podpis), generuje fotorealistyczne **wycinki AI na przezroczystym tle**, a na końcu **sam sprawdza stronę** w przeglądarce (desktop + telefon): brakujące obrazki, przewijanie w poziomie, tekst poza ekranem.
+Agent planuje historię strony (krzywa emocji, jeden szczyt, jeden ruch-podpis), generuje fotorealistyczne **wycinki AI na przezroczystym tle** (a bez generatora robi placeholdery, żeby od razu ocenić ruch), a na końcu **sam sprawdza stronę** w przeglądarce (desktop + telefon, także z ograniczonym ruchem): brakujące obrazki, nachodzący na siebie tekst, kontrast na faktycznej klatce, wagę strony i podstawy dostępności.
 
 Instalacja: `npx skills add https://github.com/aievolutionpl/epic-motion-sites` albo w Claude Code `/plugin marketplace add aievolutionpl/epic-motion-sites`. Oba dema powyżej zbudował od początku do końca agent korzystający z tego skilla.
 

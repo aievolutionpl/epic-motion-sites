@@ -3,36 +3,50 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- ===== EDIT: page meta (title, description, social preview) ===== -->
 <title>SYK — lemoniada rzemieślnicza</title>
+<meta name="description" content="SYK, rzemieślnicza lemoniada z Krakowa. Trzy smaki: cytryna z miętą, malina z rabarbarem, marakuja z mango. Zero konserwantów.">
+<meta name="theme-color" content="#f4d65a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SYK — lemoniada rzemieślnicza">
+<meta property="og:description" content="Trzy smaki. Zero ściemy.">
+<meta property="og:image" content="img/b-cytryna.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23f4d65a'/%3E%3Ctext x='32' y='44' font-family='Arial Black,sans-serif' font-size='30' text-anchor='middle' fill='%231f1a14'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="preload" as="image" href="img/b-cytryna.webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* ===== EDIT: palette. Field colours live in FLAV (script) ===== */
   :root{--ink:#1f1a14;--cream:#fffaf0;--bg:#f4d65a}
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{font-family:Jost,system-ui,sans-serif;color:var(--ink);background:var(--cream);overflow-x:hidden}
   .display{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.035em}
   img{user-select:none;-webkit-user-drag:none}
+  :focus-visible{outline:2px solid var(--ink);outline-offset:4px;border-radius:6px}
+  .skip{position:absolute;left:12px;top:-60px;z-index:200;background:var(--ink);color:var(--cream);padding:10px 16px;border-radius:99px;text-decoration:none}
+  .skip:focus{top:12px}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
   /* NAV */
-  nav{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:22px 4vw}
-  nav.solid{background:rgba(255,250,240,.92);backdrop-filter:blur(10px);padding-top:14px;padding-bottom:14px;transition:padding .3s}
-  nav.solid .logo{color:var(--ink)}
-  .logo{font-family:'Bricolage Grotesque';font-weight:800;font-size:30px;letter-spacing:-.04em;color:#fff;text-decoration:none;transition:color .5s}
+  nav{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:22px 4vw;transition:background .4s,padding .3s}
+  nav.solid{background:rgba(255,250,240,.92);backdrop-filter:blur(10px);padding-top:14px;padding-bottom:14px}
+  .logo{font-family:'Bricolage Grotesque';font-weight:800;font-size:30px;letter-spacing:-.04em;color:var(--ink);text-decoration:none}
   .logo small{font-family:Jost;font-weight:500;font-size:11px;letter-spacing:.2em;margin-left:8px;opacity:.75;vertical-align:middle}
   .tabs{display:flex;gap:34px}
-  .tabs button{background:none;border:0;cursor:pointer;font:600 12px Jost;letter-spacing:.2em;color:var(--ink);opacity:.55;padding:6px 0;position:relative;transition:opacity .3s}
+  .tabs button{background:none;border:0;cursor:pointer;font:600 12px Jost;letter-spacing:.2em;color:var(--ink);opacity:.62;padding:6px 0;position:relative;transition:opacity .3s}
   .tabs button::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:currentColor;transform:scaleX(0);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
-  .tabs button.on{opacity:1}.tabs button.on::after{transform:scaleX(1)}
+  .tabs button[aria-selected=true]{opacity:1}.tabs button[aria-selected=true]::after{transform:scaleX(1)}
   .navr{display:flex;gap:18px;align-items:center;font:600 12px Jost;letter-spacing:.18em}
   .navr a{color:var(--ink);text-decoration:none}
-  .navr .pill{border:1.5px solid var(--ink);border-radius:99px;padding:9px 18px}
+  .navr .pill{border:1.5px solid var(--ink);border-radius:99px;padding:9px 18px;white-space:nowrap}
 
   /* STAGE */
-  #stage{position:relative;height:100vh;min-height:560px;overflow:hidden;background:var(--bg);touch-action:pan-y}
+  #stage{position:relative;height:100vh;height:100svh;min-height:560px;overflow:hidden;background:var(--bg);touch-action:pan-y}
   .el{position:absolute;left:50%;top:50%;will-change:transform,opacity}
   .word{color:#fff;white-space:nowrap;line-height:.8;font-size:100px;z-index:2;pointer-events:none}
-  .bottle{z-index:5;height:66vh;max-height:660px;filter:drop-shadow(0 34px 34px rgba(60,30,0,.22))}
+  .bottle{z-index:5;height:66vh;max-height:660px;width:auto;filter:drop-shadow(0 34px 34px rgba(60,30,0,.22))}
   .ing{z-index:3}
   .ing.near{z-index:7;filter:blur(7px)}
   .ing.far{z-index:1;filter:blur(1.4px)}
@@ -40,8 +54,8 @@
 
   .bottom{position:absolute;left:4vw;right:4vw;bottom:28px;z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:20px}
   .info{font-size:15px;line-height:1.45;max-width:300px}
-  .info b{display:block;font:600 11px Jost;letter-spacing:.22em;margin-bottom:6px;opacity:.7}
-  .cta{justify-self:center;display:inline-flex;gap:12px;align-items:center;background:var(--ink);color:#fff;text-decoration:none;border-radius:99px;
+  .info b{display:block;font:600 11px Jost;letter-spacing:.22em;margin-bottom:6px}
+  .cta{justify-self:center;display:inline-flex;gap:12px;align-items:center;background:var(--ink);color:#fff;text-decoration:none;border-radius:99px;white-space:nowrap;
        padding:16px 30px;font:600 12px Jost;letter-spacing:.22em;transition:transform .3s,box-shadow .3s}
   .cta:hover{transform:translateY(-2px);box-shadow:0 14px 30px -10px rgba(0,0,0,.4)}
   .ctrl{justify-self:end;white-space:nowrap;display:flex;align-items:center;gap:16px;font:600 12px Jost;letter-spacing:.18em}
@@ -49,36 +63,43 @@
   .ctrl button:hover{background:var(--ink);color:#fff}
   .prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(31,26,20,.12);z-index:20}
   .prog i{display:block;height:100%;width:0;background:var(--ink)}
-  .hint{position:absolute;right:4vw;top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:right center;font:600 10px Jost;letter-spacing:.3em;opacity:.5;z-index:20}
+  .hint{position:absolute;right:4vw;top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:right center;font:600 10px Jost;letter-spacing:.3em;opacity:.7;z-index:20}
 
   /* SECTIONS */
-  section.why{padding:130px 6vw 110px}
+  section.why{padding:clamp(80px,10vw,130px) 6vw clamp(72px,8vw,110px)}
   .why .head{display:flex;justify-content:space-between;align-items:end;gap:40px;flex-wrap:wrap;margin-bottom:56px}
   .why h2{font-size:clamp(46px,6.4vw,100px);line-height:.88}
-  .why .head p{max-width:380px;font-size:17px;line-height:1.55;opacity:.75}
+  .why .head p{max-width:380px;font-size:17px;line-height:1.55;color:#5c5246}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
   .card{min-width:0;border-radius:30px;padding:30px 30px 34px;position:relative;overflow:hidden;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
   .card:hover{transform:translateY(-8px)}
   .card .pic{height:300px;display:flex;justify-content:center;align-items:flex-end;margin-bottom:22px}
-  .card .pic img{height:100%;filter:drop-shadow(0 20px 20px rgba(60,30,0,.2));transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+  .card .pic img{height:100%;width:auto;filter:drop-shadow(0 20px 20px rgba(60,30,0,.2));transition:transform .6s cubic-bezier(.2,.8,.2,1)}
   .card:hover .pic img{transform:rotate(-6deg) scale(1.04)}
   .card h3{font-family:'Bricolage Grotesque';font-weight:800;font-size:34px;letter-spacing:-.03em}
-  .card p{margin:6px 0 20px;opacity:.75;line-height:1.5}
+  .card p{margin:6px 0 20px;line-height:1.5}
   .card .row{display:flex;justify-content:space-between;align-items:center;font:600 12px Jost;letter-spacing:.18em}
   .card .row span:last-child{font-family:'Bricolage Grotesque';font-size:26px;letter-spacing:-.02em}
   .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:80px;border-top:1.5px solid var(--ink);padding-top:30px}
   .facts div{min-width:0}
   .facts b{font-family:'Bricolage Grotesque';font-size:54px;letter-spacing:-.04em;display:block}
-  .facts span{opacity:.7}
+  .facts span{color:#5c5246}
   footer{background:var(--ink);color:var(--cream);padding:64px 6vw;display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px}
   footer .logo{color:var(--cream);font-size:56px}
-  footer p{opacity:.7;line-height:1.7;font-size:15px}
+  footer p{color:#d8cfc0;line-height:1.7;font-size:15px}
+
+  @supports (animation-timeline: view()){
+    @media (prefers-reduced-motion: no-preference){
+      .reveal{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 70%}
+      @keyframes rise{from{opacity:0;transform:translateY(60px) scale(.97)}}
+    }
+  }
 
   @media (max-width:860px){
     .tabs{position:absolute;left:0;right:0;top:70px;justify-content:center;gap:22px}
     .navr a:not(.pill){display:none}
     nav.solid .tabs{display:none}
-    .cta{white-space:nowrap;font-size:11px;letter-spacing:.16em}
+    .cta{font-size:11px;letter-spacing:.16em}
     .bottle{height:50vh}
     .bottom{grid-template-columns:1fr auto;bottom:22px}
     .info{display:none}
@@ -92,22 +113,25 @@
 </style>
 </head>
 <body>
+<a class="skip" href="#smaki">Przejdź do sklepu</a>
 
-<nav>
+<nav aria-label="Główna nawigacja">
   <a class="logo" href="#stage">SYK<small>LEMONIADA</small></a>
-  <div class="tabs" id="tabs"></div>
+  <div class="tabs" id="tabs" role="tablist" aria-label="Smaki"></div>
   <div class="navr"><a href="#smaki">SKLEP</a><a class="pill" href="#smaki">KOSZYK · 0</a></div>
 </nav>
 
-<section id="stage">
+<main>
+<section id="stage" aria-roledescription="karuzela" aria-label="Smaki lemoniady SYK">
+  <h1 class="sr">SYK — lemoniada rzemieślnicza w trzech smakach</h1>
   <div class="floor" id="floor"></div>
-  <div class="hint">PRZEWIŃ LUB PRZECIĄGNIJ</div>
+  <div class="hint" aria-hidden="true">PRZEWIŃ LUB PRZECIĄGNIJ</div>
   <div class="bottom">
-    <div class="info" id="info"><b>01 / 03</b><span></span></div>
+    <div class="info" id="info" aria-live="polite"><b>01 / 03</b><span></span></div>
     <a class="cta" href="#smaki" id="cta">KUP TERAZ →</a>
     <div class="ctrl"><span id="count">01 / 03</span><button id="prev" aria-label="Poprzedni smak">←</button><button id="next" aria-label="Następny smak">→</button></div>
   </div>
-  <div class="prog"><i id="bar"></i></div>
+  <div class="prog" aria-hidden="true"><i id="bar"></i></div>
 </section>
 
 <section class="why" id="smaki">
@@ -117,11 +141,12 @@
   </div>
   <div class="grid" id="grid"></div>
   <div class="facts">
-    <div><b class="display">0%</b><span>konserwantów i aromatów</span></div>
-    <div><b class="display">38%</b><span>wyciśniętych owoców w butelce</span></div>
-    <div><b class="display">330 ml</b><span>zwrotne szkło, kaucja 50 gr</span></div>
+    <div class="reveal"><b class="display">0%</b><span>konserwantów i aromatów</span></div>
+    <div class="reveal"><b class="display">38%</b><span>wyciśniętych owoców w butelce</span></div>
+    <div class="reveal"><b class="display">330 ml</b><span>zwrotne szkło, kaucja 50 gr</span></div>
   </div>
 </section>
+</main>
 
 <footer>
   <a class="logo" href="#stage">SYK</a>
@@ -130,42 +155,48 @@
 </footer>
 
 <script>
-/* ---------- data ---------- */
+/* ===== EDIT: one entry per flavour. Product = img/b-<id>.webp, ingredients = img/<ing>.webp ===== */
 const FLAV=[
   {id:'cytryna', word:'CYTRYNA', bg:'#f4d65a', tag:'Cytryna · mięta', desc:'Kwaśna jak trzeba, chłodna jak poranek. Sycylijskie cytryny i świeża mięta.', price:'9 zł', ing:['cyt-a','cyt-b']},
   {id:'malina',  word:'MALINA',  bg:'#f3a0b6', tag:'Malina · rabarbar', desc:'Malinowy krzak z działki babci i rabarbar, który szczypie w język.', price:'10 zł', ing:['mal-a','mal-b']},
   {id:'marakuja',word:'MARAKUJA',bg:'#f6a45a', tag:'Marakuja · mango', desc:'Tropik w butelce. Słodkie mango, kwaśna marakuja i dużo bąbli.', price:'10 zł', ing:['mar-a','mar-b']},
 ];
-/* ingredient layout: x,y = fraction of W,H from centre; s = px at 1440 wide; d = depth */
+/* ===== EDIT: ingredient layout. x,y = fraction of W,H from centre; s = px at 1440 wide; d = depth.
+   Keep near (big, blurred) items away from the nav and the bottom bar. ===== */
 const LAY=[
   {k:0,x:-.29,y:-.20,s:150,d:'mid', r:-20},
   {k:1,x:.26, y:-.24,s:150,d:'mid', r:25},
   {k:0,x:.31, y:.14, s:110,d:'far', r:40},
   {k:1,x:-.34,y:.17, s:120,d:'far', r:-15},
   {k:0,x:-.47,y:.10, s:300,d:'near',r:15},
-  {k:1,x:.43, y:-.40,s:250,d:'near',r:-30},
+  {k:1,x:.43, y:-.17,s:250,d:'near',r:-30},
   {k:0,x:.14, y:.36, s:90, d:'far', r:5},
 ];
-const SPEED={near:1.9,mid:1.25,far:.7};
+const SPEED={near:1.9,mid:1.25,far:.7};     // parallax: near layers travel further than the product
+const AUTOPLAY_MS=7000;                     // 0 = off. Stops for good on the first interaction
 
 /* ---------- helpers ---------- */
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 const lerp=(a,b,t)=>a+(b-a)*t;
+const outExpo=t=>t>=1?1:1-Math.pow(2,-10*t);
 const hex=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));
 const mixN=(cols,f)=>{const i=clamp(Math.floor(f),0,cols.length-2),t=clamp(f-i);const A=hex(cols[i]),B=hex(cols[i+1]);return `rgb(${A.map((v,j)=>Math.round(lerp(v,B[j],t))).join(',')})`};
 const $=id=>document.getElementById(id);
 const stage=$('stage');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------- build ---------- */
 const slides=FLAV.map((f,i)=>{
-  const word=document.createElement('div'); word.className='el word display'; word.textContent=f.word; stage.appendChild(word);
-  const bottle=document.createElement('img'); bottle.className='el bottle'; bottle.src=`img/b-${f.id}.webp`; bottle.alt=`Lemoniada SYK ${f.tag}`; stage.appendChild(bottle);
-  const ings=LAY.map((L,j)=>{const im=document.createElement('img'); im.className='el ing '+L.d; im.src=`img/${f.ing[L.k]}.webp`; im.alt=''; stage.appendChild(im); return {im,L,ph:Math.random()*6.28};});
+  const word=document.createElement('div'); word.className='el word display'; word.textContent=f.word;
+  word.setAttribute('aria-hidden','true'); stage.appendChild(word);                // decorative: the tabs carry the name
+  const bottle=document.createElement('img'); bottle.className='el bottle'; bottle.src=`img/b-${f.id}.webp`; bottle.alt=`Lemoniada SYK ${f.tag}`;
+  bottle.decoding='async'; if(i===0) bottle.fetchPriority='high'; stage.appendChild(bottle);
+  const ings=LAY.map((L,j)=>{const im=document.createElement('img'); im.className='el ing '+L.d; im.src=`img/${f.ing[L.k]}.webp`; im.alt=''; im.decoding='async'; stage.appendChild(im); return {im,L,ph:Math.random()*6.28};});
   return {word,bottle,ings};
 });
-$('tabs').innerHTML=FLAV.map((f,i)=>`<button data-i="${i}">${f.word}</button>`).join('');
-$('grid').innerHTML=FLAV.map(f=>`<div class="card" style="background:${f.bg}"><div class="pic"><img src="img/b-${f.id}.webp" alt="" loading="lazy"></div>
-  <h3>${f.word[0]+f.word.slice(1).toLowerCase()}</h3><p>${f.desc}</p><div class="row"><span>DO KOSZYKA +</span><span>${f.price}</span></div></div>`).join('');
+$('tabs').innerHTML=FLAV.map((f,i)=>`<button role="tab" data-i="${i}" aria-selected="false">${f.word}</button>`).join('');
+$('grid').innerHTML=FLAV.map(f=>`<article class="card reveal" style="background:${f.bg}"><div class="pic"><img src="img/b-${f.id}.webp" alt="" loading="lazy"></div>
+  <h3>${f.word[0]+f.word.slice(1).toLowerCase()}</h3><p>${f.desc}</p><div class="row"><span>DO KOSZYKA +</span><span>${f.price}</span></div></article>`).join('');
 
 /* fit giant words to the viewport width */
 function fitWords(){
@@ -175,11 +206,11 @@ function fitWords(){
 addEventListener('resize',fitWords); document.fonts.ready.then(fitWords); fitWords();
 
 /* ---------- controls ---------- */
-const N=FLAV.length; let target=0, cur=0, lock=0, lastInput=performance.now();
-function go(i){ target=clamp(i,0,N-1); lastInput=performance.now(); ui(); }
+const N=FLAV.length; let target=0, cur=0, lock=0, touched=false;
+function go(i,user=true){ target=clamp(i,0,N-1); if(user) touched=true; ui(); }
 function ui(){
   const i=Math.round(target);
-  document.querySelectorAll('.tabs button').forEach((b,j)=>b.classList.toggle('on',j===i));
+  document.querySelectorAll('.tabs button').forEach((b,j)=>b.setAttribute('aria-selected',j===i));
   $('count').textContent=`0${i+1} / 0${N}`;
   $('info').innerHTML=`<b>0${i+1} — ${FLAV[i].tag.toUpperCase()}</b><span>${FLAV[i].desc}</span>`;
   $('cta').textContent=`KUP TERAZ · ${FLAV[i].price} →`;
@@ -189,18 +220,20 @@ $('prev').onclick=()=>go(Math.round(target)-1);
 $('next').onclick=()=>go(Math.round(target)+1);
 addEventListener('keydown',e=>{ if(stage.getBoundingClientRect().bottom<innerHeight*.5) return;
   if(e.key==='ArrowRight')go(Math.round(target)+1); if(e.key==='ArrowLeft')go(Math.round(target)-1); });
-/* wheel: change flavour while the stage is on screen, release to the page at the ends */
+/* wheel: change flavour while the stage is pinned at the top, release to the page at the ends */
 stage.addEventListener('wheel',e=>{
   const d=Math.abs(e.deltaY)>Math.abs(e.deltaX)?e.deltaY:e.deltaX, i=Math.round(target);
-  if(window.scrollY>4) return;                                 // only while the stage is pinned at top
+  if(window.scrollY>4) return;
   if((d>0&&i<N-1)||(d<0&&i>0)){ e.preventDefault(); if(performance.now()-lock>750&&Math.abs(d)>8){lock=performance.now(); go(i+(d>0?1:-1));} }
   else if(performance.now()-lock<750) e.preventDefault();
 },{passive:false});
 /* drag / swipe */
 let sx=null; stage.addEventListener('pointerdown',e=>{sx=e.clientX});
 addEventListener('pointerup',e=>{ if(sx==null)return; const dx=e.clientX-sx; sx=null; if(Math.abs(dx)>50) go(Math.round(target)+(dx<0?1:-1)); });
-/* autoplay until the user interacts */
-setInterval(()=>{ if(performance.now()-lastInput>7000 && window.scrollY<10){ target=(Math.round(target)+1)%N; ui(); } },7000);
+/* autoplay: never with reduced motion, never after the user touched it, only while visible */
+let stageOn=true;
+new IntersectionObserver(([en])=>stageOn=en.isIntersecting).observe(stage);
+if(AUTOPLAY_MS&&!reduce) setInterval(()=>{ if(!touched&&stageOn&&!document.hidden){ go((Math.round(target)+1)%N,false); } },AUTOPLAY_MS);
 ui();
 
 /* nav turns solid once the stage has scrolled away */
@@ -208,28 +241,34 @@ const nav=document.querySelector('nav');
 addEventListener('scroll',()=>nav.classList.toggle('solid',scrollY>stage.offsetHeight-90),{passive:true});
 
 /* ---------- frame ---------- */
-const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let t0=null, last=0, lastBg='';
 function frame(t){
-  cur = reduce ? target : cur+(target-cur)*.075;
-  const W=innerWidth, H=innerHeight, mobile=W<860, k=Math.min(1.1,W/1440)*(mobile?1.5:1);
-  stage.style.background=mixN(FLAV.map(f=>f.bg),cur);
+  if(t0===null) t0=last=t;
+  const dt=Math.min(t-last,64); last=t;
+  cur = reduce ? target : cur+(target-cur)*(1-Math.pow(1-.075,dt/16.67));   // frame-rate independent
+  if(!stageOn&&Math.abs(target-cur)<1e-4){ requestAnimationFrame(frame); return; }   // offscreen: sleep
+  const W=innerWidth, H=innerHeight, mobile=W<860, k=Math.min(1.1,W/1440)*(mobile?1.5:1), idle=reduce?0:1;
+  /* intro: word slides up, bottle rises, ingredients burst out from behind it */
+  const it=reduce?9:(t-t0)/1000;
+  const iw=outExpo(clamp((it-.1)/1)), ib=outExpo(clamp((it-.25)/1.1)), ii=outExpo(clamp((it-.55)/1.2));
+  const bg=mixN(FLAV.map(f=>f.bg),cur); if(bg!==lastBg){ stage.style.background=bg; lastBg=bg; }
   slides.forEach((s,i)=>{
-    const o=i-cur, vis=clamp(1-Math.abs(o)*1.15);
-    const idle=reduce?0:1;
-    s.word.style.transform=`translate(-50%,-50%) translate(${o*W*1.35}px,${-H*(mobile?.10:.04)}px)`;
-    s.word.style.opacity=vis;
+    const o=i-cur, vis=clamp(1-Math.abs(o)*1.15);       // neighbours reach 0 at distance 1, or they leak in
+    s.word.style.transform=`translate(-50%,-50%) translate(${o*W*1.35}px,${-H*(mobile?.10:.04)+(1-iw)*H*.18}px)`;
+    s.word.style.opacity=vis*iw;
     const bob=Math.sin(t/900+i)*8*idle, rot=Math.sin(t/1300+i)*1.6*idle + o*-14;
-    s.bottle.style.transform=`translate(-50%,-50%) translate(${o*W}px,${bob+(mobile?H*.04:H*.02)}px) rotate(${rot}deg)`;
-    s.bottle.style.opacity=clamp(1.2-Math.abs(o));
+    s.bottle.style.transform=`translate(-50%,-50%) translate(${o*W}px,${bob+(mobile?H*.04:H*.02)+(1-ib)*H*.6}px) rotate(${rot+(1-ib)*8}deg)`;
+    s.bottle.style.opacity=clamp(1.2-Math.abs(o))*clamp(ib*2);
     s.ings.forEach(({im,L,ph})=>{
       const sp=SPEED[L.d], dx=Math.sin(t/2100+ph)*10*idle, dy=Math.cos(t/1700+ph)*12*idle;
-      const xx=L.x*W*(mobile?.85:1)+o*W*sp+dx, yy=L.y*H+dy;
+      const spread=lerp(.2,1,ii);
+      const xx=(L.x*W*(mobile?.85:1))*spread+o*W*sp+dx, yy=L.y*H*spread+dy;
       im.style.width=(L.s*k)+'px';
-      im.style.transform=`translate(-50%,-50%) translate(${xx}px,${yy}px) rotate(${L.r+o*40*sp+Math.sin(t/2600+ph)*8*idle}deg)`;
-      im.style.opacity=vis;
+      im.style.transform=`translate(-50%,-50%) translate(${xx}px,${yy}px) rotate(${L.r+o*40*sp+Math.sin(t/2600+ph)*8*idle}deg) scale(${lerp(.4,1,ii)})`;
+      im.style.opacity=vis*ii;
     });
   });
-  $('floor').style.transform=`translate(-50%,-50%) translate(0px,${H*(mobile?.30:.36)}px) scale(${1-Math.abs(cur-Math.round(cur))*.5},1)`;
+  $('floor').style.transform=`translate(-50%,-50%) translate(0px,${H*(mobile?.30:.36)}px) scale(${(1-Math.abs(cur-Math.round(cur))*.5)*ib},1)`;
   $('bar').style.width=((cur)/(N-1)*100)+'%';
   requestAnimationFrame(frame);
 }

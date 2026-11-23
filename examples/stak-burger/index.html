@@ -3,14 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- ===== EDIT: page meta (title, description, social preview) ===== -->
 <title>STAK — smash burger bar</title>
+<meta name="description" content="STAK, smash burger bar w Warszawie. Podwójna wołowina rozbita na rozgrzanej płycie, cheddar 12 mies., bułki pieczone na miejscu.">
+<meta name="theme-color" content="#b8461a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="STAK — smash burger bar">
+<meta property="og:description" content="Miłość od pierwszego kęsa. Zobacz, z czego składa się nasz burger.">
+<meta property="og:image" content="img/burger.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23b8461a'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='38' text-anchor='middle' fill='%23fbf3e0'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="preload" as="image" href="img/burger.webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* ===== EDIT: brand palette. JS reads these, so this is the single source of truth ===== */
   :root{
-    --terra:#b8461a; --cream:#fbf3e0; --ink:#2a1a10; --teal:#0f5c55;
-    --fg:var(--cream);
+    --field:#b8461a;   /* hero colour field */
+    --cream:#fbf3e0;   /* light neutral the story fades into */
+    --ink:#2a1a10;     /* off-black with a hue, never #000 */
+    --accent:#b8461a;  /* owns one role: prices */
+    --fg:var(--cream); /* live colour of chrome over the stage (set by JS) */
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -20,29 +34,33 @@
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
   .serif{font-family:'DM Serif Display',serif;font-weight:400}
+  :focus-visible{outline:2px solid currentColor;outline-offset:4px;border-radius:6px}
+  .skip{position:absolute;left:12px;top:-60px;z-index:200;background:var(--ink);color:var(--cream);padding:10px 16px;border-radius:99px;text-decoration:none}
+  .skip:focus{top:12px}
 
   /* NAV */
-  nav.solid{background:rgba(251,243,224,.92);backdrop-filter:blur(10px)}
-  nav{transition:background .4s;position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
-      padding:22px 4vw;color:var(--fg);transition:color .5s}
-  .logo{line-height:.9}
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+      padding:22px 4vw;color:var(--fg);transition:background .4s,color .35s,padding .3s}
+  nav.solid{background:rgba(251,243,224,.92);backdrop-filter:blur(10px);color:var(--ink);padding-top:14px;padding-bottom:14px}
+  .logo{line-height:.9;color:inherit;text-decoration:none}
   .logo b{font-family:'DM Serif Display',serif;font-weight:400;font-size:38px;letter-spacing:.02em;display:block}
   .logo i{font-family:'DM Serif Display',serif;font-size:15px;display:block;padding-left:14px}
   .links{display:flex;gap:42px;font-size:13px;font-weight:600;letter-spacing:.14em}
   .links a{color:inherit;text-decoration:none;padding-bottom:6px;border-bottom:2px solid transparent}
   .links a.on{border-color:currentColor}
   .right{display:flex;align-items:center;gap:18px}
-  .pill{border:1.5px solid currentColor;border-radius:99px;padding:11px 22px;font-size:13px;font-weight:600;letter-spacing:.14em;
+  .pill{border:1.5px solid currentColor;border-radius:99px;padding:11px 22px;font-size:13px;font-weight:600;letter-spacing:.14em;white-space:nowrap;
         color:inherit;text-decoration:none;display:flex;gap:10px;align-items:center;transition:background .3s,color .3s}
-  .pill:hover{background:var(--fg);color:var(--terra)}
-  .burgerbtn{width:26px;display:grid;gap:5px}
+  .pill:hover{background:currentColor}
+  .pill:hover span{color:var(--field)}
+  .burgerbtn{width:26px;display:grid;gap:5px;background:none;border:0;color:inherit;cursor:pointer;padding:4px 0}
   .burgerbtn span{height:2px;background:currentColor;display:block}
 
   /* STORY (sticky scroll) */
   #story{height:520vh;position:relative}
-  .stage{position:sticky;top:0;height:100vh;overflow:hidden;background:var(--terra)}
+  .stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:var(--field)}
   .side{position:absolute;left:3.2vw;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:14px;
-        color:var(--fg);font-size:11px;font-weight:600;letter-spacing:.2em;z-index:5;transition:color .5s}
+        color:var(--fg);font-size:11px;font-weight:600;letter-spacing:.2em;z-index:5;transition:color .35s}
   .side .v{writing-mode:vertical-rl;transform:rotate(180deg)}
   .side .bar{width:1.5px;height:90px;background:currentColor;opacity:.7}
   .dots{position:absolute;right:3vw;top:50%;transform:translateY(-50%);display:grid;gap:12px;z-index:5}
@@ -52,22 +70,23 @@
   .panel{position:absolute;z-index:6;will-change:opacity,transform}
   .hero-txt{left:12vw;top:50%;transform:translateY(-50%);color:var(--cream);max-width:520px}
   .kicker{font-size:15px;font-weight:600;letter-spacing:.22em;margin-bottom:10px}
-  .hero-txt h1{font-size:clamp(54px,7.6vw,118px);line-height:.86;letter-spacing:-.01em}
-  .hero-txt p{font-size:19px;line-height:1.45;margin:26px 0 30px;opacity:.95}
-  .cta{display:inline-flex;gap:12px;align-items:center;background:var(--cream);color:var(--terra);border-radius:99px;padding:15px 28px;
+  .hero-txt h1{font-size:clamp(54px,7.6vw,118px);line-height:.86;letter-spacing:-.01em;text-wrap:balance}
+  .hero-txt h1 .w{display:inline-block;will-change:transform,opacity,filter}
+  .hero-txt p{font-size:19px;line-height:1.45;margin:26px 0 30px}
+  .cta{display:inline-flex;gap:12px;align-items:center;background:var(--cream);color:var(--field);border-radius:99px;padding:15px 28px;white-space:nowrap;
        font-size:13px;font-weight:600;letter-spacing:.18em;text-decoration:none;transition:transform .3s, box-shadow .3s}
   .cta:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.2)}
   .cta.dark{background:var(--ink);color:var(--cream)}
 
   .ballet{left:0;right:0;top:12vh;text-align:center;color:var(--ink);pointer-events:none}
-  .ballet h2,.final h2{font-size:clamp(40px,5.4vw,84px);line-height:.95}
+  .ballet h2,.final h2{font-size:clamp(40px,5.4vw,84px);line-height:.95;text-wrap:balance;padding:0 6vw}
   .final{left:0;right:0;top:11vh;text-align:center;color:var(--ink)}
   .final .cta{margin-top:22px}
 
   .burger{position:absolute;left:50%;top:50%;width:440px;z-index:4;will-change:transform}
-  .layer{position:absolute;left:50%;will-change:transform}
+  .layer{position:absolute;left:50%;will-change:transform,opacity}
   .layer img{display:block;user-select:none}
-  .photo{position:absolute;left:50%;bottom:-4px;width:440px;transform:translateX(-50%);z-index:60;pointer-events:none;user-select:none}
+  .photo{position:absolute;left:50%;bottom:-4px;width:440px;height:auto;transform:translateX(-50%);z-index:60;pointer-events:none;user-select:none}
   .label{position:absolute;white-space:nowrap;color:var(--ink);font-size:14px;line-height:1.25;opacity:0;pointer-events:none}
   .label b{display:block;font-family:'DM Serif Display',serif;font-weight:400;font-size:22px}
   .label small{font-size:13px;opacity:.7}
@@ -82,24 +101,32 @@
   .plate{position:absolute;left:50%;top:50%;width:640px;height:150px;z-index:2;border-radius:50%;
          background:radial-gradient(ellipse at 50% 40%,#fff 0 46%,#efe6d6 56%,#d9ccb6 66%,#f8f2e6 72%,#cbbca3 100%);
          box-shadow:0 30px 60px -20px rgba(60,30,10,.35)}
-  .crumb{position:absolute;left:50%;top:50%;z-index:5;border-radius:50%;will-change:transform}
+  .crumb{position:absolute;left:50%;top:50%;z-index:3;border-radius:50%;will-change:transform}   /* behind the product: never over label text */
 
   /* MENU */
-  #menu{padding:140px 6vw 120px;background:var(--cream)}
+  #menu{padding:clamp(80px,10vw,140px) 6vw clamp(72px,9vw,120px);background:var(--cream)}
   #menu .head{display:flex;justify-content:space-between;align-items:end;gap:40px;flex-wrap:wrap;margin-bottom:60px}
   #menu h2{font-size:clamp(44px,6vw,90px);line-height:.9}
-  #menu .head p{max-width:380px;font-size:17px;line-height:1.5;opacity:.75}
+  #menu .head p{max-width:380px;font-size:17px;line-height:1.5;color:#6b5546}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
   .card{min-width:0;background:#fff8ea;border:1px solid #ecdcbf;border-radius:28px;padding:34px;transition:transform .4s, box-shadow .4s}
   .card:hover{transform:translateY(-6px);box-shadow:0 24px 50px -24px rgba(120,60,20,.35)}
   .card .mini{height:190px;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
   .card h3{font-family:'DM Serif Display',serif;font-weight:400;font-size:34px}
-  .card p{opacity:.7;margin:8px 0 22px;line-height:1.5}
+  .card p{color:#6b5546;margin:8px 0 22px;line-height:1.5}
   .card .row{display:flex;justify-content:space-between;align-items:center;font-weight:600;letter-spacing:.12em;font-size:13px}
-  .card .price{font-family:'DM Serif Display',serif;font-size:28px;letter-spacing:0;color:var(--terra)}
+  .card .price{font-family:'DM Serif Display',serif;font-size:28px;letter-spacing:0;color:var(--accent)}
   footer{background:var(--ink);color:var(--cream);padding:70px 6vw;display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px}
   footer .logo b{font-size:52px}
-  footer p{opacity:.7;line-height:1.7;font-size:15px}
+  footer p{color:#d9cbb4;line-height:1.7;font-size:15px}
+
+  /* below-the-story reveals: native scroll-driven CSS, content stays visible where unsupported */
+  @supports (animation-timeline: view()){
+    @media (prefers-reduced-motion: no-preference){
+      .reveal{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 70%}
+      @keyframes rise{from{opacity:0;transform:translateY(60px) scale(.97)}}
+    }
+  }
 
   @media (max-width:860px){
     .links{display:none}
@@ -114,28 +141,31 @@
 </style>
 </head>
 <body>
+<a class="skip" href="#menu">Przejdź do menu</a>
 
-<nav id="nav">
-  <div class="logo"><b>STAK</b><i>smash burger bar</i></div>
+<nav id="nav" aria-label="Główna nawigacja">
+  <a class="logo" href="#story"><b>STAK</b><i>smash burger bar</i></a>
   <div class="links">
     <a href="#story" class="on">START</a><a href="#menu">MENU</a><a href="#story">HISTORIA</a><a href="#kontakt">KONTAKT</a>
   </div>
   <div class="right">
-    <a class="pill" href="#kontakt">ZAREZERWUJ <span>⌕</span></a>
-    <div class="burgerbtn"><span></span><span></span><span></span></div>
+    <a class="pill" href="#kontakt"><span>ZAREZERWUJ →</span></a>
+    <button class="burgerbtn" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
 
-<section id="story">
+<main>
+<section id="story" aria-label="Z czego składa się burger STAK">
   <div class="stage" id="stage">
-    <div class="side"><span class="v" id="secNum">01</span><span class="bar"></span><span class="v" id="secName">SEKCJA 01</span></div>
-    <div class="dots"><i class="on"></i><i></i><i></i></div>
+    <div class="side" aria-hidden="true"><span class="v" id="secNum">01</span><span class="bar"></span><span class="v" id="secName">SEKCJA 01</span></div>
+    <div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
 
+    <!-- ===== EDIT: scene copy. Kicker, 2-5 word headline, one sentence, one CTA ===== -->
     <div class="panel hero-txt" id="pHero">
-      <div class="kicker">01 — SMASH</div>
-      <h1 class="serif">MIŁOŚĆ OD PIERWSZEGO KĘSA.</h1>
-      <p>Rozbity na rozgrzanej płycie.<br>Wykończony roztopionym cheddarem.</p>
-      <a class="cta" href="#menu">ZOBACZ MENU →</a>
+      <div class="kicker" data-intro="0">01 — SMASH</div>
+      <h1 class="serif" id="heroH1">MIŁOŚĆ OD PIERWSZEGO KĘSA.</h1>
+      <p data-intro="2">Rozbity na rozgrzanej płycie.<br>Wykończony roztopionym cheddarem.</p>
+      <a class="cta" href="#menu" data-intro="3">ZOBACZ MENU →</a>
     </div>
 
     <div class="panel ballet" id="pBallet">
@@ -162,16 +192,19 @@
   </div>
   <div class="grid" id="grid"></div>
 </section>
+</main>
 
 <footer id="kontakt">
-  <div class="logo"><b>STAK</b><i>smash burger bar</i></div>
+  <a class="logo" href="#story"><b>STAK</b><i>smash burger bar</i></a>
   <p>ul. Ogniowa 12, Warszawa<br>pon–nd 12:00–23:00<br>rezerwacje: +48 000 000 000</p>
   <p>Instagram<br>TikTok<br>Facebook</p>
 </footer>
 
 <script>
-/* ---------- photo layers (AI render, transparent webp) ---------- */
-const img=(src,w)=>()=>`<img src="img/${src}.webp" width="${w}" alt="" draggable="false">`;
+/* ===== EDIT: layers, top to bottom. Transparent WebP cutouts from prep_assets.py.
+   w = CSS width, h = CSS height of the cropped image at that width (prep_assets prints it),
+   t = how far down the NEXT layer starts (overlap when stacked), n/d = label copy. ===== */
+const img=(src,w)=>()=>`<img src="img/${src}.webp" width="${w}" alt="" draggable="false" decoding="async">`;
 const LAYERS=[
   {f:img('topbun',420),   w:420,h:220,t:150,n:'Bułka brioche',      d:'opiekana na maśle'},
   {f:img('lettuce',440),  w:440,h:133,t:34, n:'Sałata lodowa',      d:'chrupiąca i zimna'},
@@ -182,16 +215,40 @@ const LAYERS=[
   {f:img('patty',420),    w:420,h:180,t:100,n:'Podwójna wołowina',  d:'rozbita, 2 × 90 g'},
   {f:img('bottombun',420),w:420,h:179,t:0,  n:'Spód brioche',       d:'udźwignie wszystko'},
 ];
+const HERO_PHOTO={src:'img/burger.webp', alt:'Smash burger STAK: podwójna wołowina, cheddar, warzywa w bułce brioche'};
+/* ===== EDIT: menu cards. Last array = which LAYERS build the mini product ===== */
+const MENU=[
+  ['Classic Smash','Pojedyncza wołowina, cheddar, ogórki, cebula, sos STAK.','34 zł',[0,4,3,5,6,7]],
+  ['Double Trouble','Dwie rozbite wołowiny, podwójny cheddar, sałata, pomidor.','42 zł',[0,1,2,5,6,5,6,7]],
+  ['Truffle Melt','Wołowina, cheddar, czerwona cebula, majonez truflowy.','46 zł',[0,3,5,6,7]],
+];
+const SECTIONS=['SMASH','SKŁADNIKI','STÓŁ'];   // side rail names, one per scene
 
-/* ---------- build burger ---------- */
-const burger=document.getElementById('burger');
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const ss=(a,b,v)=>{const t=clamp((v-a)/(b-a));return t*t*(3-2*t)};
+const lerp=(a,b,t)=>a+(b-a)*t;
+const outExpo=t=>t>=1?1:1-Math.pow(2,-10*t);
+const outBack=t=>{const c=1.4;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)};
+const hex=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));
+const mixRGB=(A,B,t)=>A.map((v,i)=>Math.round(lerp(v,B[i],t)));
+const rgb=a=>`rgb(${a.join(',')})`;
+const lum=c=>{const f=v=>(v/=255)<=.03928?v/12.92:((v+.055)/1.055)**2.4;return .2126*f(c[0])+.7152*f(c[1])+.0722*f(c[2])};
+const contrast=(a,b)=>{const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+const css=getComputedStyle(document.documentElement), tok=n=>hex(css.getPropertyValue(n).trim());
+const C={field:tok('--field'),cream:tok('--cream'),ink:tok('--ink')};
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- build product ---------- */
+const burger=$('burger'), stage=$('stage');
 let y=0; const els=[];
 LAYERS.forEach((L,i)=>{
   const el=document.createElement('div'); el.className='layer';
   el.style.top=y+'px'; el.style.marginLeft=(-L.w/2)+'px'; el.style.zIndex=50-i;
   el.innerHTML=L.f();
   const lab=document.createElement('div');
-  lab.className='label '+(i%2||innerWidth<860?'r':'l');
+  lab.className='label';
   lab.style.top=(L.h*.45-22)+'px';
   lab.innerHTML=`<em>0${i+1}</em><b>${L.n}</b><small>${L.d}</small>`;
   el.appendChild(lab);
@@ -199,13 +256,17 @@ LAYERS.forEach((L,i)=>{
   els.push({el,lab,y,L});
   y+=L.t;
 });
-const TOTAL=y+LAYERS.at(-1).h;
+const TOTAL=y+LAYERS.at(-1).h, N=LAYERS.length;
 burger.style.height=TOTAL+'px';
-const photo=document.createElement('img'); photo.className='photo'; photo.src='img/burger.webp'; photo.alt='Smash burger STAK'; burger.appendChild(photo);
-const N=LAYERS.length; let GAP=78;
+const photo=document.createElement('img'); photo.className='photo'; photo.src=HERO_PHOTO.src; photo.alt=HERO_PHOTO.alt;
+photo.width=440; photo.fetchPriority='high'; burger.appendChild(photo);
 
-/* crumbs / sesame */
-const stage=document.getElementById('stage');
+/* labels alternate sides on desktop, all on one side on phones */
+let labelMode=null;
+function placeLabels(mobile){ if(labelMode===mobile) return; labelMode=mobile;
+  els.forEach(({lab},i)=>lab.className='label '+(i%2||mobile?'r':'l')); }
+
+/* crumbs / sesame orbiting during the explode */
 const crumbs=[...Array(22)].map((_,i)=>{
   const c=document.createElement('div'); c.className='crumb';
   const seed=i%3===0, s=seed?10:4+Math.random()*7;
@@ -215,104 +276,120 @@ const crumbs=[...Array(22)].map((_,i)=>{
   return {c,a:Math.random()*Math.PI*2,r:180+Math.random()*260,sp:.4+Math.random(),rot:Math.random()*360};
 });
 
-/* menu cards (mini burgers) */
-const menu=[
-  ['Classic Smash','Pojedyncza wołowina, cheddar, ogórki, cebula, sos STAK.','34 zł',[0,4,3,5,6,7]],
-  ['Double Trouble','Dwie rozbite wołowiny, podwójny cheddar, sałata, pomidor.','42 zł',[0,1,2,5,6,5,6,7]],
-  ['Truffle Melt','Wołowina, cheddar, czerwona cebula, majonez truflowy.','46 zł',[0,3,5,6,7]],
-];
-document.getElementById('grid').innerHTML=menu.map(([n,d,p,ids])=>{
+/* menu cards rebuilt from the same cutouts */
+$('grid').innerHTML=MENU.map(([n,d,p,ids])=>{
   let yy=0, parts='';
-  ids.forEach((k,j)=>{const L=LAYERS[k]; parts+=`<div style="position:absolute;left:50%;margin-left:${-L.w/2}px;top:${yy}px;z-index:${50-j}">${L.f()}</div>`; yy+=L.t;});
+  ids.forEach((k,j)=>{const L=LAYERS[k]; parts+=`<div style="position:absolute;left:50%;margin-left:${-L.w/2}px;top:${yy}px;z-index:${50-j}">${L.f().replace('<img','<img loading="lazy"')}</div>`; yy+=L.t;});
   const h=yy+LAYERS[ids.at(-1)].h, sc=Math.min(.42,180/h);
-  return `<div class="card"><div class="mini"><div style="position:relative;width:440px;height:${h}px;transform:scale(${sc});flex:none">${parts}</div></div>
-  <h3>${n}</h3><p>${d}</p><div class="row"><span>ZAMÓW</span><span class="price">${p}</span></div></div>`;
+  return `<article class="card reveal"><div class="mini" aria-hidden="true"><div style="position:relative;width:440px;height:${h}px;transform:scale(${sc});flex:none">${parts}</div></div>
+  <h3>${n}</h3><p>${d}</p><div class="row"><span>ZAMÓW</span><span class="price">${p}</span></div></article>`;
 }).join('');
 
+/* intro: split the headline into words that rise in one by one */
+const h1=$('heroH1');
+h1.innerHTML=h1.textContent.trim().split(/\s+/).map((w,i)=>`<span class="w" data-intro="${1+i*.35}">${w}</span>`).join(' ');
+const introEls=[...document.querySelectorAll('[data-intro]')].map(el=>({el,d:+el.dataset.intro}));
+
 /* ---------- scroll choreography ---------- */
-const $=id=>document.getElementById(id);
 const pHero=$('pHero'),pBallet=$('pBallet'),pFinal=$('pFinal'),plate=$('plate'),shadow=$('shadow'),nav=$('nav');
 const dots=[...document.querySelectorAll('.dots i')];
 const story=$('story');
-const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
-const ss=(a,b,v)=>{const t=clamp((v-a)/(b-a));return t*t*(3-2*t)};
-const lerp=(a,b,t)=>a+(b-a)*t;
-const mix=(c1,c2,t)=>{const h=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));const A=h(c1),B=h(c2);return `rgb(${A.map((v,i)=>Math.round(lerp(v,B[i],t))).join(',')})`};
-
-let target=0,cur=0;
-function measure(){const r=story.getBoundingClientRect();target=clamp(-r.top/(r.height-innerHeight));}
+let target=0,cur=0,storyOn=true,t0=null,last=0,introDone=reduce;
+function measure(){const r=story.getBoundingClientRect();target=clamp(-r.top/(r.height-innerHeight));
+  storyOn=r.bottom>0&&r.top<innerHeight; nav.classList.toggle('solid',r.bottom<innerHeight-2);}
 addEventListener('scroll',measure,{passive:true}); addEventListener('resize',measure); measure();
+let lastBg='',lastFg='',lastSec=-1;
 
 function frame(t){
-  cur+= (target-cur)*.09;
-  const p=cur, W=innerWidth, H=innerHeight, mobile=W<860; GAP=mobile?130:78;
+  if(t0===null) t0=last=t;
+  const dt=Math.min(t-last,64); last=t;
+  cur = reduce ? target : cur+(target-cur)*(1-Math.pow(1-.09,dt/16.67));   // .09 per 60 Hz frame, same feel at 120 Hz
+  if(!storyOn && introDone && Math.abs(target-cur)<1e-4){ requestAnimationFrame(frame); return; }  // offscreen: sleep
+  const p=cur, W=innerWidth, H=innerHeight, mobile=W<860, GAP=mobile?130:78, idle=reduce?0:1;
+  placeLabels(mobile);
+
+  /* phases (see references/patterns.md A) */
   const toCream=ss(.14,.3,p);
-  const ex=ss(.22,.46,p)-ss(.64,.8,p);          // explode amount
+  const ex=ss(.22,.46,p)-ss(.64,.8,p);          // explode amount: out, then back
   const toCenter=ss(.1,.32,p);
   const land=ss(.7,.92,p);
 
-  stage.style.background=mix('#b8461a','#fbf3e0',toCream);
-  const fg=mix('#fbf3e0','#2a1a10',toCream);
-  document.documentElement.style.setProperty('--fg',fg);
-  const inMenu=story.getBoundingClientRect().bottom<innerHeight-2;   // stage is leaving -> solid nav
-  nav.style.color=inMenu?'#2a1a10':fg;
-  nav.classList.toggle('solid',inMenu);
+  /* intro (time-based, 1.6 s once, skipped for reduced motion) */
+  const it=reduce?1e9:(t-t0)/1000;
+  if(!introDone){
+    introEls.forEach(({el,d})=>{ const e=outExpo(clamp((it-.15-d*.12)/.8));
+      el.style.opacity=e; el.style.transform=`translateY(${(1-e)*40}px)`; el.style.filter=e<1?`blur(${(1-e)*8}px)`:''; });
+    if(it>2.4){ introEls.forEach(({el})=>{el.style.opacity='';el.style.transform='';el.style.filter='';}); introDone=true; }
+  }
+  const drop=reduce?1:outBack(clamp((it-.25)/1.1));
 
-  // panels
+  /* colour: background fades; chrome picks whichever ink reads better on the current field */
+  const bgA=mixRGB(C.field,C.cream,toCream), bg=rgb(bgA);
+  if(bg!==lastBg){ stage.style.background=bg; lastBg=bg; }
+  const fg=rgb(contrast(C.cream,bgA)>=contrast(C.ink,bgA)?C.cream:C.ink);
+  if(fg!==lastFg){ document.documentElement.style.setProperty('--fg',fg); lastFg=fg; }
+
+  /* panels */
   pHero.style.opacity=1-ss(.06,.18,p);
   pHero.style.transform=(mobile?'':'translateY(-50%) ')+`translateX(${-ss(.06,.2,p)*(mobile?14:80)}px)`;
+  pHero.style.visibility=p>.2?'hidden':'visible';
   const bOp=ss(.24,.34,p)-ss(.58,.66,p);
   pBallet.style.opacity=bOp; pBallet.style.transform=`translateY(${(1-ss(.24,.36,p))*30}px)`;
   pFinal.style.opacity=ss(.8,.9,p); pFinal.style.transform=`translateY(${(1-ss(.8,.92,p))*30}px)`;
   pFinal.style.pointerEvents=p>.85?'auto':'none';
 
-  // burger scale/position
+  /* product scale/position. Size from the EXPLODED height or the top layer hits the headline */
   const baseS=Math.min(1,(mobile?W*.8:W*.36)/440,H*.6/TOTAL);
   const exH=TOTAL+(N-1)*GAP;
   const exS=Math.min(baseS,H*(mobile?.7:.64)/exH, (mobile?W*.4:W*.9)/440);
   const endS=Math.min(1,H*.46/TOTAL,W*.7/440);
   let s=lerp(baseS,exS,ss(.18,.4,p)); s=lerp(s,endS,ss(.66,.86,p));
+  s*=lerp(.9,1,clamp(drop));
   const heroX=mobile?0:W*.2, heroY=mobile?H*.2:H*.02;
-  const bob=Math.sin(t/900)*8*(1-toCenter);
+  const bob=Math.sin(t/900)*8*(1-toCenter)*idle;
   const x=lerp(heroX,0,toCenter)-(mobile?W*.2*ex:0);
-  let yy=lerp(heroY,H*.06+ex*H*.05,toCenter); yy=lerp(yy,H*.16,land); yy+=bob;
-  const rot=lerp(-9,0,toCenter)+Math.sin(t/1400)*1.5*(1-toCenter);
+  let yy=lerp(heroY,H*.06+ex*H*.05,toCenter); yy=lerp(yy,H*.16,land); yy+=bob-(1-drop)*H*.35;
+  const rot=lerp(-9,0,toCenter)+Math.sin(t/1400)*1.5*(1-toCenter)*idle+(1-drop)*-12;
+  burger.style.opacity=clamp(drop*1.6);
   burger.style.transform=`translate(-50%,-50%) translate(${x}px,${yy}px) scale(${s}) rotate(${rot}deg)`;
 
-  const ph=clamp(1-ss(.19,.26,p)+ss(.7,.8,p));
+  /* hero photo <-> layers. Swap only while the stack is closed, or you see two burgers */
+  const ph=clamp(1-ss(.19,.26,p)+ss(.795,.83,p));
   photo.style.opacity=ph;
+  const lo=ss(.3,.42,p)-ss(.56,.64,p);
   els.forEach(({el,lab},i)=>{
     el.style.opacity=1-ph;
     const off=(i-(N-1)/2)*GAP*ex;
-    const wob=Math.sin(t/700+i)*ex*3;
+    const wob=Math.sin(t/700+i)*ex*3*idle;
     el.style.transform=`translateY(${off}px) rotate(${(i%2?1:-1)*ex*3+wob*.3}deg) translateX(${(i%2?1:-1)*ex*6}px)`;
-    const lo=ss(.3,.42,p)-ss(.56,.64,p);
     lab.style.opacity=lo;
-    lab.style.transform=`scale(${1/s}) translateX(${(i%2?1:-1)*(1-lo)*20}px)`;
+    const side=(i%2||mobile)?1:-1;                 // labels slide in toward the product
+    lab.style.transform=`scale(${1/s}) translateX(${side*(1-lo)*20}px)`;
   });
 
-  // shadow + plate
+  /* shadow + plate */
   const bottom=yy+TOTAL*s/2;
-  shadow.style.opacity=(1-toCenter)*.9 + land*.6;
-  shadow.style.transform=`translate(-50%,-50%) translate(${x}px,${bottom+10}px) scale(${s*(1-.15*ex)},1)`;
+  shadow.style.opacity=((1-toCenter)*.9 + land*.6)*clamp(drop);
+  shadow.style.transform=`translate(-50%,-50%) translate(${x}px,${bottom+10+bob*-1}px) scale(${s*(1-.15*ex)},1)`;
   const pl=ss(.62,.82,p);
   plate.style.opacity=pl;
   const ps=Math.min(1,W*.9/640);
   plate.style.transform=`translate(-50%,-50%) translate(0px,${H*.16+TOTAL*endS/2 - 12 + (1-pl)*120}px) scale(${ps})`;
 
-  // crumbs
+  /* crumbs */
   crumbs.forEach(k=>{
     const r=k.r*(.35+ex*1.1)*Math.max(s,.5);
-    const a=k.a+t/6000*k.sp;
-    const cx=x+Math.cos(a)*r*1.2, cy=yy+Math.sin(a)*r*.8 + Math.sin(t/800+k.a)*6;
-    k.c.style.opacity=clamp(.25+ex)*(1-land);
-    k.c.style.transform=`translate(${cx}px,${cy}px) rotate(${k.rot+t/30*k.sp}deg)`;
+    const a=k.a+t/6000*k.sp*idle;
+    const cx=x+Math.cos(a)*r*1.2, cy=yy+Math.sin(a)*r*.8 + Math.sin(t/800+k.a)*6*idle;
+    k.c.style.opacity=clamp(.25+ex)*(1-land)*clamp(drop);
+    k.c.style.transform=`translate(${cx}px,${cy}px) rotate(${k.rot+t/30*k.sp*idle}deg)`;
   });
 
-  // side indicator
+  /* side indicator */
   const sec=p<.22?0:p<.66?1:2;
-  dots.forEach((d,i)=>d.classList.toggle('on',i===sec));
-  $('secNum').textContent='0'+(sec+1); $('secName').textContent='SEKCJA 0'+(sec+1);
+  if(sec!==lastSec){ lastSec=sec;
+    dots.forEach((d,i)=>d.classList.toggle('on',i===sec));
+    $('secNum').textContent='0'+(sec+1); $('secName').textContent=SECTIONS[sec]; }
 
   requestAnimationFrame(frame);
 }
