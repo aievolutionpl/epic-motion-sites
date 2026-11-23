@@ -24,14 +24,16 @@ npx skills add https://github.com/greensock/gsap-skills
 Let those skills own the API details. This file only covers how to use GSAP inside an epic-motion-site.
 
 ## CDN setup (single-file sites)
+Pin exact versions (a floating `@3` can change under a finished site). GSAP 3.15 and Lenis 1.3 are
+current stable lines as of Nov 2026; GSAP 4 is in beta, so stay on 3.x.
 ```html
-<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
-<script>gsap.registerPlugin(ScrollTrigger);</script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
+<script>gsap.registerPlugin(ScrollTrigger); ScrollTrigger.config({ignoreMobileResize:true});</script>
 ```
 Optional smooth scrolling with Lenis (MIT):
 ```html
-<script src="https://unpkg.com/lenis@1/dist/lenis.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.27/dist/lenis.min.js"></script>
 <script>
   const lenis = new Lenis({ lerp: .09 });
   lenis.on('scroll', ScrollTrigger.update);
@@ -59,6 +61,20 @@ tl.to('#stage', { backgroundColor:'#fbf3e0', duration:.16 }, .14)
   .to('.layer', { y:i=>(i-(N-1)/2)*GAP, duration:.24, stagger:.01 }, .22)
   .to('.layer', { y:0, duration:.16 }, .64);
 ```
+
+## Reduced motion and breakpoints
+Wrap every timeline in `gsap.matchMedia()`, so reduced motion and phones get their own version
+and everything is reverted cleanly when the condition changes:
+```js
+const mm=gsap.matchMedia();
+mm.add({desk:'(min-width:860px)', phone:'(max-width:859px)', calm:'(prefers-reduced-motion: reduce)'}, ctx=>{
+  const {phone,calm}=ctx.conditions;
+  if(calm){ gsap.set('.layer',{y:0}); return; }          // static composition, no scrub
+  const GAP=phone?130:78;
+  /* build the timeline here, using GAP */
+});
+```
+In React use `useGSAP()` from `@gsap/react`, which scopes and cleans up for you.
 
 ## Verification is the same
 `scripts/verify.py` works for GSAP sites too, because it only scrolls and screenshots. Give ScrollTrigger time to catch up with `--settle 1400` when `scrub` is above 1.
