@@ -1,0 +1,11 @@
+{
+  "name": "epic-motion-sites",
+  "description": "Award-style animated motion websites in one HTML file: scroll-explode products, giant-word sliders, 3D galleries, with photoreal AI cutouts and automatic Playwright verification. By AI Evolution Polska.",
+  "version": "1.0.0",
+  "author": { "name": "AI Evolution Polska" },
+  "homepage": "https://github.com/aievolutionpl/epic-motion-sites",
+  "repository": "https://github.com/aievolutionpl/epic-motion-sites",
+  "license": "MIT",
+  "keywords": ["motion", "scroll", "animation", "landing-page", "website", "gsap", "ai-images"],
+  "skills": "./skills/"
+}

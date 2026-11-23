@@ -1,0 +1,14 @@
+{
+  "name": "aievolutionpl",
+  "owner": { "name": "AI Evolution Polska" },
+  "metadata": { "description": "Agent skills by AI Evolution Polska" },
+  "plugins": [
+    {
+      "name": "epic-motion-sites",
+      "source": "./",
+      "description": "Award-style animated motion websites with AI product cutouts and automatic browser verification.",
+      "version": "1.0.0",
+      "category": "design"
+    }
+  ]
+}
